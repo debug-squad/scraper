@@ -6,7 +6,23 @@ import requests
 import time
 import re
 import datetime
+
+def pridobi_lokacijo(lokacija):
+    URL = "https://geocode.search.hereapi.com/v1/geocode"
+    location = lokacija
+    api_key = '3mwvcKwJlLuKTjEInn_o7EuK-huPVEGfj5zjXl8N4HA' 
+    PARAMS = {'apikey':api_key,'q':location} 
+
+    r = requests.get(url = URL, params = PARAMS) 
+    data = r.json()
+    try:
+        latitude = data['items'][0]['position']['lat']
+        longitude = data['items'][0]['position']['lng']
+    except:
+        latitude = None
+        longitude = None
     
+    return([latitude, longitude])
 
 def pridobi_podatke():
     browser_options = webdriver.ChromeOptions()
@@ -47,7 +63,7 @@ def pridobi_podatke():
         #
         #
         #
-        
+
         print(podatki_array)
 
     browser.close()
