@@ -184,8 +184,15 @@ def pridobi_podatke(token):
 #
 #
 
-payload = {'client_name': 'test123', 'password': 'test123'}
-c = requests.post('https://mb-hub.herokuapp.com/login', data=payload)
-print(c.json())
-token = c.json()['data']['token']
-pridobi_podatke(token)
+while True:
+    payload = {'client_name': 'test123', 'password': 'test123'}
+    c = requests.post('https://mb-hub.herokuapp.com/login', data=payload)
+    print(c.json())
+    token = c.json()['data']['token']
+    headers = {'Authorization': 'Bearer '+ token}
+    r = requests.get('https://mb-hub.herokuapp.com/config-event/', headers=headers)
+    t = r.json()
+    v = t[0]
+    interval=v['interval']
+    time.sleep(interval)
+    pridobi_podatke(token)
