@@ -24,6 +24,19 @@ def pridobi_lokacijo(lokacija):
     
     return([latitude, longitude])
 
+def pridobi_datum(datum):
+    x = re.findall("((0[1-9]|[12][0-9]|3[01]|[1-9]).\s(0[1-9]|1[0-2]|[1-9]).\s\d{4})", datum)
+    datumi=[]
+    try:
+        datumi.append(datetime.datetime.strptime(x[0][0], "%d. %m. %Y").isoformat())
+    except:
+        datumi.append(datum)
+    try:
+        datumi.append(datetime.datetime.strptime(x[1][0], "%d. %m. %Y").isoformat())
+    except:
+        datumi.append(None)
+    return datumi
+
 def pridobi_podatke():
     browser_options = webdriver.ChromeOptions()
     prefs = {'profile.managed_default_content_settings.images': 2, "profile.default_content_setting_values.notifications" : 2 }
