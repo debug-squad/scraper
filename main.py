@@ -7,6 +7,14 @@ import time
 import re
 import datetime
 
+def write_json(data, token):
+    headers = {'Authorization': 'Bearer '+ token}
+    print(data)
+    try:
+        r = requests.post('https://mb-hub.herokuapp.com/event', json=data, headers=headers)
+    except:
+        print("ni slo")
+
 def pridobi_lokacijo(lokacija):
     URL = "https://geocode.search.hereapi.com/v1/geocode"
     location = lokacija
@@ -37,7 +45,7 @@ def pridobi_datum(datum):
         datumi.append(None)
     return datumi
 
-def pridobi_podatke():
+def pridobi_podatke(token):
     browser_options = webdriver.ChromeOptions()
     prefs = {'profile.managed_default_content_settings.images': 2, "profile.default_content_setting_values.notifications" : 2 }
     browser_options.add_experimental_option('prefs', prefs)
@@ -77,7 +85,98 @@ def pridobi_podatke():
         #
         #
 
-        print(podatki_array)
+        if(len(podatki_array)==7):
+            lokacija = pridobi_lokacijo(podatki_array[1])
+            datum=pridobi_datum(podatki_array[0])
+            write_json({
+                "title": naslov,
+                "description": opis,
+                "date_start": datum[0],
+                "date_end": datum[1],
+                "location": {
+                    "type": "Point",
+                    "coordinates":lokacija
+                },
+                "organization": podatki_array[2],
+                "contact": podatki_array[3],
+                "price": podatki_array[4],
+                "tags": [podatki_array[5]],
+                "site_url": podatki_array[6],
+                "image_url": url
+            }, token)
+        elif(len(podatki_array)==6):
+            lokacija = pridobi_lokacijo(podatki_array[1])
+            datum=pridobi_datum(podatki_array[0])
+            write_json({
+                "title": naslov,
+                "description": opis,
+                "date_start": datum[0],
+                "date_end": datum[1],
+                "location": {
+                    "type": "Point",
+                    "coordinates":lokacija
+                },
+                "organization": None,
+                "contact": podatki_array[2],
+                "price": podatki_array[3],
+                "tags": [podatki_array[4]],
+                "site_url": podatki_array[5],
+                "image_url": url
+            },token)
+        elif(len(podatki_array)==5):
+            lokacija = pridobi_lokacijo(podatki_array[1])
+            datum=pridobi_datum(podatki_array[0])
+            write_json({
+                "title": naslov,
+                "description": opis,
+                "date_start": datum[0],
+                "date_end": datum[1],
+                "location": {
+                    "type": "Point",
+                    "coordinates":lokacija
+                },
+                "organization": None,
+                "contact": podatki_array[2],
+                "price": None,
+                "tags": [podatki_array[3]],
+                "image_url": url
+            },token)
+        elif(len(podatki_array)==4):
+            lokacija = pridobi_lokacijo(podatki_array[1])
+            datum=pridobi_datum(podatki_array[0])
+            write_json({
+                "title": naslov,
+                "opis": opis,
+                "date_start": datum[0],
+                "date_end": datum[1],
+                "location": {
+                    "type": "Point",
+                    "coordinates":lokacija
+                },
+                "organization": None,
+                "contact": podatki_array[2],
+                "price": None,
+                "tags": [podatki_array[3]],
+                "image_url": url
+            },token)
+        elif(len(podatki_array)==3):
+            lokacija = pridobi_lokacijo(podatki_array[1])
+            datum=pridobi_datum(podatki_array[0])
+            write_json({
+                "title": naslov,
+                "description": opis,
+                "date_start": datum[0],
+                "date_end": datum[1],
+                "location": {
+                    "type": "Point",
+                    "coordinates":lokacija
+                },
+                "organization": None,
+                "contact": None,
+                "price": None,
+                "tags": [podatki_array[2]],
+                "image_url": url
+            },token)
 
     browser.close()
 
@@ -85,4 +184,8 @@ def pridobi_podatke():
 #
 #
 
-pridobi_podatke()
+payload = {'client_name': 'test123', 'password': 'test123'}
+c = requests.post('https://mb-hub.herokuapp.com/login', data=payload)
+print(c.json())
+token = c.json()['data']['token']
+pridobi_podatke(token)
